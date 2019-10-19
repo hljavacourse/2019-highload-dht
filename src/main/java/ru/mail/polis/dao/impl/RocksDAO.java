@@ -30,7 +30,7 @@ public class RocksDAO implements DAO {
         }
     }
 
-    private ByteBuffer deepCopy(ByteBuffer src) {
+    private ByteBuffer deepCopy(final ByteBuffer src) {
         ByteBuffer clone = ByteBuffer.allocate(src.capacity());
         src.rewind();
         clone.put(src);
