@@ -23,7 +23,7 @@ public class RocksRecordIterator implements Iterator<Record> {
 
     @Override
     public Record next() {
-        Record resultRecord = Record.of(ByteBuffer.wrap(rocksIterator.key()),
+        final Record resultRecord = Record.of(ByteBuffer.wrap(rocksIterator.key()),
                 ByteBuffer.wrap(rocksIterator.value()));
         if (rocksIterator.isValid()) {
             rocksIterator.next();
