@@ -70,7 +70,7 @@ public class RocksDAO implements DAO {
 
     @NotNull
     @Override
-    public Iterator<Record> range(@NotNull ByteBuffer from, @Nullable ByteBuffer to) {
+    public Iterator<Record> range(@NotNull final ByteBuffer from, @Nullable final ByteBuffer to) {
         assert to != null;
         return Iters.until(new RocksRecordIterator(db, from),
                 Record.of(to, ByteBuffer.allocate(0)));
