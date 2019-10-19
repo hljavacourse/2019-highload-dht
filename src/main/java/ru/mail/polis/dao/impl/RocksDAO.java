@@ -59,7 +59,7 @@ public class RocksDAO implements DAO {
 
     @NotNull
     @Override
-    public Iterator<Record> iterator(@NotNull ByteBuffer from) {
+    public Iterator<Record> iterator(@NotNull final ByteBuffer from) {
         return new RocksRecordIterator(db, from);
     }
 
