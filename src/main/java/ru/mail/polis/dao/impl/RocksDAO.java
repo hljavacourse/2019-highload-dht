@@ -78,7 +78,7 @@ public class RocksDAO implements DAO {
 
     @NotNull
     @Override
-    public ByteBuffer get(@NotNull ByteBuffer key) throws NoSuchElementException, RockDBNewExceptionLite {
+    public ByteBuffer get(@NotNull final ByteBuffer key) throws NoSuchElementException, RockDBNewExceptionLite {
         byte[] bytes = null;
         try {
             bytes = db.get(deepCopy(key).array());
