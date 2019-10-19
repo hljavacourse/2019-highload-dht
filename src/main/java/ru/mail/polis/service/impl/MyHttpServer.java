@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 public class MyHttpServer extends HttpServer implements Service {
     private final DAO dao;
 
-    public MyHttpServer(final int port, @NotNull DAO dao) throws IOException {
+    public MyHttpServer(final int port, @NotNull final DAO dao) throws IOException {
         super(getConfig(port));
         this.dao = dao;
     }
