@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.util.NoSuchElementException;
 
 public class MyHttpServer extends HttpServer implements Service {
-    private DAO dao;
+    private final DAO dao;
 
     public MyHttpServer(final int port, @NotNull DAO dao) throws IOException {
         super(getConfig(port));
