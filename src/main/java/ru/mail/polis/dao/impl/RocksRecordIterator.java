@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 public class RocksRecordIterator implements Iterator<Record> {
-    private RocksIterator rocksIterator;
+    private final RocksIterator rocksIterator;
 
     RocksRecordIterator(final RocksDB db, final ByteBuffer from) {
         super();
