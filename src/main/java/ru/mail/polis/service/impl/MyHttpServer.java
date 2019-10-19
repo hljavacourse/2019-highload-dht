@@ -75,7 +75,7 @@ public class MyHttpServer extends HttpServer implements Service {
         }
         AcceptorConfig acceptor = new AcceptorConfig();
         acceptor.port = port;
-        HttpServerConfig httpServerConfig = new HttpServerConfig();
+        final HttpServerConfig httpServerConfig = new HttpServerConfig();
         httpServerConfig.acceptors = new AcceptorConfig[]{acceptor};
         httpServerConfig.selectors = 4;
         return httpServerConfig;
