@@ -37,9 +37,6 @@ public class MyHttpServer extends HttpServer implements Service {
                     catch (NoSuchElementException e) {
                         return new Response(Response.NOT_FOUND, "Key not found".getBytes(Charsets.UTF_8));
                     }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
 
                 case Request.METHOD_PUT:
                     dao.upsert(key, ByteBuffer.wrap(request.getBody()));
