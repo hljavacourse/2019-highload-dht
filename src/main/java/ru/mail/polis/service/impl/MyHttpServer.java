@@ -31,7 +31,7 @@ public class MyHttpServer extends HttpServer implements Service {
                 case Request.METHOD_GET:
                     try {
                         final ByteBuffer value = dao.get(key).duplicate();
-                        byte[] body = value.array();
+                        final byte[] body = value.array();
                         return new Response(Response.OK, body);
                     }
                     catch (NoSuchElementException e) {
