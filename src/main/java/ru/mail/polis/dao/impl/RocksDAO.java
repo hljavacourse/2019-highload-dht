@@ -49,7 +49,7 @@ public class RocksDAO implements DAO {
         }
     }
 
-    public void remove(@NotNull ByteBuffer key) throws RockDBNewExceptionLite {
+    public void remove(@NotNull final ByteBuffer key) throws RockDBNewExceptionLite {
         try {
             db.delete(deepCopy(key).array());
         } catch (RocksDBException e) {
