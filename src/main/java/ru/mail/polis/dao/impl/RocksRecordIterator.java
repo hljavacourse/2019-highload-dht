@@ -10,7 +10,7 @@ import java.util.Iterator;
 public class RocksRecordIterator implements Iterator<Record> {
     private RocksIterator rocksIterator;
 
-    RocksRecordIterator(RocksDB db, ByteBuffer from) {
+    RocksRecordIterator(final RocksDB db, final ByteBuffer from) {
         super();
         rocksIterator = db.newIterator();
         rocksIterator.seek(from.array());
