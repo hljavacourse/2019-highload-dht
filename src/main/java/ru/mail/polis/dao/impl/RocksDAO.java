@@ -50,7 +50,7 @@ public class RocksDAO implements DAO {
     }
     
     /**
-    * remove method from RocksDB
+    * remove method from RocksDB.
     */
     public void remove(@NotNull final ByteBuffer key) throws RockDBNewExceptionLite {
         try {
