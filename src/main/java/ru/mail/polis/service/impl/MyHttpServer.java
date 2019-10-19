@@ -73,7 +73,7 @@ public class MyHttpServer extends HttpServer implements Service {
         if (port <= 1024 || port >= 65535) {
             throw new IllegalArgumentException("Invalid port");
         }
-        AcceptorConfig acceptor = new AcceptorConfig();
+        final AcceptorConfig acceptor = new AcceptorConfig();
         acceptor.port = port;
         final HttpServerConfig httpServerConfig = new HttpServerConfig();
         httpServerConfig.acceptors = new AcceptorConfig[]{acceptor};
