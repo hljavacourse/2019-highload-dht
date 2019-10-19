@@ -48,7 +48,10 @@ public class RocksDAO implements DAO {
             throw new RockDBNewExceptionLite("error with upsert", e);
         }
     }
-
+    
+    /**
+    * remove method from RocksDB
+    */
     public void remove(@NotNull final ByteBuffer key) throws RockDBNewExceptionLite {
         try {
             db.delete(deepCopy(key).array());
