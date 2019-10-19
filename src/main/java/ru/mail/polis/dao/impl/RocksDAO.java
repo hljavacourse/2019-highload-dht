@@ -40,8 +40,8 @@ public class RocksDAO implements DAO {
     }
 
     public void upsert(
-            @NotNull ByteBuffer key,
-            @NotNull ByteBuffer value) throws RockDBNewExceptionLite {
+            @NotNull final ByteBuffer key,
+            @NotNull final ByteBuffer value) throws RockDBNewExceptionLite {
         try {
             db.put(deepCopy(key).array(), deepCopy(value).array());
         } catch (RocksDBException e) {
