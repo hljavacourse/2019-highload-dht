@@ -94,8 +94,11 @@ public class RocksDAO implements DAO {
         return ByteBuffer.wrap(bytes);
     }
 
-    @Override
-    public void compact() {
-
+    public void compact() throws RockException {
+        try {
+            db.compactRange();
+        } catch (RocksDBException exception) {
+            throw new RockException("Error while compact", exception);
+        }
     }
 }
