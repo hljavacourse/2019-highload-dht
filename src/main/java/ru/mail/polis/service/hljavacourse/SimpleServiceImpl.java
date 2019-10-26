@@ -77,6 +77,7 @@ public class SimpleServiceImpl extends HttpServer implements Service {
         }
     }
 
+    //return 200 OK and value or 404 Not Found
     private Response get(final ByteBuffer key) throws IOException {
         try {
             final ByteBuffer copy = dao.get(key).duplicate();
@@ -88,11 +89,13 @@ public class SimpleServiceImpl extends HttpServer implements Service {
         }
     }
 
+    //return 201  Created
     private Response put(final ByteBuffer key, final Request request) throws IOException {
         dao.upsert(key, ByteBuffer.wrap(request.getBody()));
         return new Response(Response.CREATED, Response.EMPTY);
     }
 
+    //return 202  Accepted
     private Response delete(final ByteBuffer key) throws IOException {
         dao.remove(key);
         return new Response(Response.ACCEPTED, Response.EMPTY);
