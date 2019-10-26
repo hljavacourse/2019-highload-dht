@@ -32,12 +32,12 @@ dependencies {
     // Guava primitives
     compile("com.google.guava:guava:27.0.1-jre")
 
-    // RocksDB
-    compile("org.rocksdb:rocksdbjni:6.2.2")
-
     // JUnit Jupiter test framework
     testCompile("org.junit.jupiter:junit-jupiter-api:5.4.0")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.0")
+
+    //Rocksdb dependency
+    compile("org.rocksdb:rocksdbjni:6.2.2")
 }
 
 val run by tasks.getting(JavaExec::class) {
@@ -46,7 +46,7 @@ val run by tasks.getting(JavaExec::class) {
 
 tasks {
     test {
-        maxHeapSize = "128m"
+        maxHeapSize = "256m"
         useJUnitPlatform()
     }
 }
@@ -56,7 +56,7 @@ application {
     mainClassName = "ru.mail.polis.Cluster"
 
     // And limit Xmx
-    applicationDefaultJvmArgs = listOf("-Xmx128m")
+    applicationDefaultJvmArgs = listOf("-Xmx256m")
 }
 
 // Fail on warnings
