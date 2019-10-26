@@ -43,7 +43,7 @@ public class SimpleDAOImpl implements DAO {
     }
     /**
     *
-    *getArray impl getArray from buffer
+    *getArray impl getArray from buffer.
     */
     public static byte[] getArray(final ByteBuffer buffer) {
         final ByteBuffer copy = buffer.duplicate();
