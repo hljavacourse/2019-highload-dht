@@ -41,6 +41,7 @@ public class SimpleDAOImpl implements DAO {
         }
         return ByteBuffer.wrap(clone);
     }
+    
     /**
     *getArray impl getArray from buffer.
     */
