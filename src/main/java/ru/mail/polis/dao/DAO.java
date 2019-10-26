@@ -95,7 +95,7 @@ public interface DAO extends Closeable {
     /**
      * Removes value by given key.
      */
-    void remove (@NotNull ByteBuffer key) throws IOException;
+    void remove(@NotNull ByteBuffer key) throws IOException;
 
     /**
      * Performs compaction.
