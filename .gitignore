@@ -2,6 +2,10 @@
 *
 
 # But not Java files...
+!*.svg
+!*.log
+!*.sh
+!*.md
 !.gitignore
 !*.java
 !README.md
