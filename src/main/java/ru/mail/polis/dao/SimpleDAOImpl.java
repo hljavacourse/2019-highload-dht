@@ -1,7 +1,9 @@
 package ru.mail.polis.dao;
 
+import static java.lang.Byte.MIN_VALUE;
 import org.jetbrains.annotations.NotNull;
-import org.rocksdb.BuiltinComparator;
+
+import static org.rocksdb.BuiltinComparator.BYTEWISE_COMPARATOR;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
@@ -18,146 +20,156 @@ public class SimpleDAOImpl implements DAO {
 
     private final RocksDB rocksDB;
 
-    public SimpleDAOImpl(@NotNull final RocksDB db) {
-        rocksDB = db;
+    private SimpleDAOImpl(final RocksDB rocksDB) {
+        this.rocksDB = rocksDB;
     }
 
-    /**
-     * create of SimpleDAOImpl.
-     *
-     * @param data file
-     * @return new SimpleDAOImpl()
-     * @throws IOException when catch RocksDBException
-     */
-    public static SimpleDAOImpl init(final File data) throws IOException {
-        try {
-            final Options options = new Options();
-            options.setComparator(BuiltinComparator.BYTEWISE_COMPARATOR);
-            options.setCreateIfMissing(true);
-            final RocksDB rocksDB = RocksDB.open(options, data.getAbsolutePath());
-
-            return new SimpleDAOImpl(rocksDB);
-        } catch (RocksDBException exp) {
-            throw new IOException(exp);
-        }
-    }
-
-    @NotNull
-    @Override
-    public Iterator<Record> iterator(@NotNull final ByteBuffer from) throws IOException {
-        final RocksIterator iterator = rocksDB.newIterator();
-        iterator.seek(getArrayByteMinusMinValue(from));
-
-        return new RocksDBIterator(iterator);
-    }
-
-    @NotNull
-    @Override
-    public ByteBuffer get(@NotNull final ByteBuffer key) throws IOException, NoSuchElementException {
-        try {
-            final byte[] value = rocksDB.get(getArrayByteMinusMinValue(key));
-            if (value == null) {
-                throw new NoSuchElementLite("Key is not present: " + key.toString());
+    private byte[] convertValuesSubMinValue(final ByteBuffer byteBuffer) {
+        synchronized (this) {
+            final byte[] array = getArray(byteBuffer);
+            for (int i = 0; i < array.length; i++) {
+                array[i] -= MIN_VALUE;
             }
-            return ByteBuffer.wrap(value);
-        } catch (RocksDBException exp) {
-            throw new IOException(exp);
+            return array;
         }
     }
 
-    /**
-     * method for get with Timestamp.
-     *
-     * @param keys ByteBuffer keys
-     * @return Timestamp
-     * @throws IOException            may be throw IOException
-     * @throws NoSuchElementException may be throw NoSuchElementException
-     */
-    public Timestamp getWithTimestamp(@NotNull final ByteBuffer keys) throws IOException, NoSuchElementException {
-        try {
-            return Timestamp.fromBytes(rocksDB.get(getArrayByteMinusMinValue(keys)));
-        } catch (RocksDBException e) {
-            throw new IOException("getWithTimestamp", e);
+    private static ByteBuffer convertValuesAddMinValue(final byte[] array) {
+        final byte[] clone = array.clone();
+        for (int i = 0; i < array.length; i++) {
+            clone[i] += MIN_VALUE;
         }
+        return ByteBuffer.wrap(clone);
+    }
+
+    /**
+     * Getting a byte array.
+     *
+     * @param buffer - final ByteBuffer
+     * @return byte array
+     */
+    public static byte[] getArray(final ByteBuffer buffer) {
+        final ByteBuffer copy = buffer.duplicate();
+        final byte[] value = new byte[copy.remaining()];
+        copy.get(value);
+        return value;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<Record> iterator(@NotNull final ByteBuffer from) {
+        final RocksIterator rocksIterator = rocksDB.newIterator();
+        final byte[] array = convertValuesSubMinValue(from);
+        rocksIterator.seek(array);
+
+        return new IteratorImpl(rocksIterator);
     }
 
     @Override
     public void upsert(@NotNull final ByteBuffer key, @NotNull final ByteBuffer value) throws IOException {
         try {
-            rocksDB.put(getArrayByteMinusMinValue(key), getArray(value));
-        } catch (RocksDBException exp) {
-            throw new IOException(exp);
+            final byte[] keyArray = convertValuesSubMinValue(key);
+            final byte[] valueArray = getArray(value);
+            rocksDB.put(keyArray, valueArray);
+        } catch (RocksDBException e) {
+            throw new IOException(e);
         }
     }
 
     /**
-     * method for upsert with Timestamp.
+     * Upsert with timestamps.
      *
-     * @param keys   ByteBuffer keys
-     * @param values ByteBuffer values
-     * @throws IOException may be throw IOException
+     * @param key   - final ByteBuffer
+     * @param value - final ByteBuffer
+     * @throws IOException - throws an exception if RocksDBException exists.
      */
-    public void upsertWithTimestamp(@NotNull final ByteBuffer keys,
-                                    @NotNull final ByteBuffer values) throws IOException {
+    public void upsertWithTimestamp(@NotNull final ByteBuffer key, @NotNull final ByteBuffer value) throws IOException {
         try {
-            rocksDB.put(getArrayByteMinusMinValue(keys),
-                    Timestamp.fromPresent(values, System.currentTimeMillis()).toBytes());
+            final byte[] convertedKey = convertValuesSubMinValue(key);
+            final byte[] timestamp = Timestamp.fromPresent(value, System.currentTimeMillis()).toBytes();
+            rocksDB.put(convertedKey, timestamp);
         } catch (RocksDBException e) {
-            throw new IOException("upsertWithTimestamp", e);
+            throw new IOException(e);
         }
     }
 
     @Override
     public void remove(@NotNull final ByteBuffer key) throws IOException {
         try {
-            rocksDB.delete(getArrayByteMinusMinValue(key));
-        } catch (RocksDBException exp) {
-            throw new IOException(exp);
+            final byte[] array = convertValuesSubMinValue(key);
+            rocksDB.delete(array);
+        } catch (RocksDBException e) {
+            throw new IOException(e);
         }
     }
 
     /**
-     * method for remove with Timestamp.
+     * Remove with timestamps.
      *
-     * @param key ByteBuffer keys
-     * @throws IOException may be throw IOException
+     * @param key - ByteBuffer key
+     * @throws IOException - throws an exception if RocksDBException exists.
      */
     public void removeWithTimestamp(@NotNull final ByteBuffer key) throws IOException {
         try {
-            rocksDB.put(getArrayByteMinusMinValue(key),
-                    Timestamp.timestamp(System.currentTimeMillis()).toBytes());
+            final byte[] convertedKey = convertValuesSubMinValue(key);
+            final byte[] value = Timestamp.timestamp(System.currentTimeMillis()).toBytes();
+            rocksDB.put(convertedKey, value);
         } catch (RocksDBException e) {
-            throw new IOException("removeWithTimestamp", e);
+            throw new IOException(e);
         }
     }
 
-    private byte[] getArrayByteMinusMinValue(@NotNull final ByteBuffer buffer) {
-        synchronized (this) {
-            final byte[] body = getArray(buffer);
-
-            for (int i = 0; i < body.length; i++) {
-                body[i] -= Byte.MIN_VALUE;
-            }
-
-            return body;
+    @NotNull
+    @Override
+    public ByteBuffer get(@NotNull final ByteBuffer key) throws IOException, NoSuchElementException {
+        try {
+            final byte[] value = getValue(key);
+            return ByteBuffer.wrap(value);
+        } catch (RocksDBException e) {
+            throw new IOException(e);
         }
     }
 
-    public static byte[] getArray(@NotNull final ByteBuffer buffer) {
-        final ByteBuffer duplicate = buffer.duplicate();
-        final byte[] body = new byte[duplicate.remaining()];
+    private byte[] getValue(@NotNull final ByteBuffer key) throws RocksDBException {
+        final byte[] array = convertValuesSubMinValue(key);
+        final byte[] value = rocksDB.get(array);
+        if (value == null) {
+            throw new SimpleNoSuchElementException("No element for given key " + key.toString());
+        }
+        return value;
+    }
 
-        duplicate.get(body);
-
-        return body;
+    /**
+     * Get with timestamps.
+     *
+     * @param key - final ByteBuffer
+     * @return Timestamp
+     * @throws IOException            - throws an exception if RocksDBException exists.
+     * @throws NoSuchElementException - throws an exception if RocksDBException exists
+     */
+    public Timestamp getWithTimestamp(@NotNull final ByteBuffer key) throws IOException, NoSuchElementException {
+        try {
+            final byte[] value = getValue(key);
+            return Timestamp.fromBytes(value);
+        } catch (RocksDBException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
+        rocksDB.close();
+    }
+
+    static SimpleDAOImpl init(final File data) throws IOException {
+        final Options options = new Options();
+        options.setComparator(BYTEWISE_COMPARATOR);
+        options.setCreateIfMissing(true);
         try {
-            rocksDB.closeE();
-        } catch (RocksDBException exp) {
-            throw new IOException(exp);
+            final RocksDB rocksDB = RocksDB.open(options, data.getPath());
+            return new SimpleDAOImpl(rocksDB);
+        } catch (RocksDBException e) {
+            throw new IOException(e);
         }
     }
 
@@ -165,22 +177,17 @@ public class SimpleDAOImpl implements DAO {
     public void compact() throws IOException {
         try {
             rocksDB.compactRange();
-        } catch (RocksDBException exp) {
-            throw new IOException(exp);
+        } catch (RocksDBException e) {
+            throw new IOException(e);
         }
     }
 
-    public static class RocksDBIterator implements Iterator<Record>, AutoCloseable {
+    public static class IteratorImpl implements Iterator<Record> {
 
         private final RocksIterator iterator;
 
-        RocksDBIterator(@NotNull final RocksIterator iterator) {
-            this.iterator = iterator;
-        }
-
-        @Override
-        public void close() {
-            iterator.close();
+        IteratorImpl(final RocksIterator rocksIterator) {
+            iterator = rocksIterator;
         }
 
         @Override
@@ -191,25 +198,13 @@ public class SimpleDAOImpl implements DAO {
         @Override
         public Record next() {
             if (hasNext()) {
-                final ByteBuffer key = getByteBufferPlusMinValue(iterator.key());
-                final ByteBuffer value = ByteBuffer.wrap(iterator.value());
-
-                final Record result = Record.of(key, value);
+                final ByteBuffer key = SimpleDAOImpl.convertValuesAddMinValue(iterator.key());
+                final Record record = Record.of(key, ByteBuffer.wrap(iterator.value()));
                 iterator.next();
-                return result;
+                return record;
             } else {
-                throw new IllegalStateException("Iterator doesn't have the next");
+                throw new IllegalStateException("End of file");
             }
-        }
-
-        private ByteBuffer getByteBufferPlusMinValue(@NotNull final byte[] byteArray) {
-            final byte[] body = byteArray.clone();
-
-            for (int i = 0; i < body.length; i++) {
-                body[i] += Byte.MIN_VALUE;
-            }
-
-            return ByteBuffer.wrap(body);
         }
     }
 }

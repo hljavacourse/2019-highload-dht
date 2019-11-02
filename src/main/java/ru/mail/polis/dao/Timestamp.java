@@ -5,38 +5,16 @@ import java.nio.ByteBuffer;
 import java.util.Comparator;
 import java.util.List;
 
-public class Timestamp {
+public final class Timestamp {
 
     private final State state;
-    private final long timestamp;
+    private final long timestampValue;
     private final ByteBuffer present;
 
-    enum State {
-        PRESENT((byte) 1),
-        REMOVED((byte) -1),
-        ABSENT((byte) 0);
-
-        final byte value;
-
-        State(final byte value) {
-            this.value = value;
-        }
-
-        static State fromValue(final byte value) {
-            if (value == REMOVED.value) {
-                return REMOVED;
-            }
-            if (value == PRESENT.value) {
-                return PRESENT;
-            }
-            return ABSENT;
-        }
-    }
-
-    private Timestamp(final long timestamp,
+    private Timestamp(final long timestampValue,
                       final ByteBuffer present,
                       final State type) {
-        this.timestamp = timestamp;
+        this.timestampValue = timestampValue;
         this.state = type;
         this.present = present;
     }
@@ -49,43 +27,56 @@ public class Timestamp {
         return new Timestamp(timestamp, null, State.REMOVED);
     }
 
-    private long getTimestamp() {
-        return timestamp;
-    }
-
     public boolean isPresent() {
         return state == State.PRESENT;
-    }
-
-    public boolean isAbsent() {
-        return state == State.ABSENT;
     }
 
     public boolean isRemoved() {
         return state == State.REMOVED;
     }
 
-    public byte[] getPresentAsBytes() throws IOException {
-        final ByteBuffer duplicate = getPresent().duplicate();
-        final byte[] result = new byte[duplicate.remaining()];
-        duplicate.get(result);
-        return result;
+    public boolean isAbsent() {
+        return state == State.ABSENT;
+    }
+
+    private long getTimestampValue() {
+        return timestampValue;
     }
 
     private ByteBuffer getPresent() throws IOException {
-        if (!isPresent()) {
-            throw new IOException("value is not present");
+        if (isPresent()) {
+            return present;
+        } else {
+            throw new IOException("Is not present");
         }
-        return present;
     }
 
+    /**
+     * Getting Present As Bytes.
+     *
+     * @return present as bytes
+     * @throws IOException - throws an exception from getPresent().
+     */
+    public byte[] getPresentAsBytes() throws IOException {
+        final ByteBuffer byteBuffer = getPresent().duplicate();
+        final byte[] bytes = new byte[byteBuffer.remaining()];
+        byteBuffer.get(bytes);
+        return bytes;
+    }
+
+    /**
+     * Merge responses.
+     *
+     * @param responses - final List of Timestamp
+     * @return responses
+     */
     public static Timestamp merge(final List<Timestamp> responses) {
         if (responses.size() == 1) {
             return responses.get(0);
         } else {
             return responses.stream()
                     .filter(timestamp -> !timestamp.isAbsent())
-                    .max(Comparator.comparingLong(Timestamp::getTimestamp))
+                    .max(Comparator.comparingLong(Timestamp::getTimestampValue))
                     .orElseGet(Timestamp::getAbsent);
         }
     }
@@ -94,15 +85,26 @@ public class Timestamp {
         return new Timestamp(-1, null, State.ABSENT);
     }
 
+    /**
+     * Getting Timestamp from bytes.
+     *
+     * @param bytes - final byte[]
+     * @return Timestamp
+     */
     public static Timestamp fromBytes(final byte[] bytes) {
         if (bytes == null) {
             return getAbsent();
         }
-        final ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        final State recordType = State.fromValue(buffer.get());
-        return new Timestamp(buffer.getLong(), buffer, recordType);
+        final ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        final State state = fromValue(byteBuffer.get());
+        return new Timestamp(byteBuffer.getLong(), byteBuffer, state);
     }
 
+    /**
+     * Getting a byte array.
+     *
+     * @return byte array
+     */
     public byte[] toBytes() {
         int length = 0;
         if (isPresent()) {
@@ -110,10 +112,32 @@ public class Timestamp {
         }
         final ByteBuffer byteBuffer = ByteBuffer.allocate(1 + Long.BYTES + length);
         byteBuffer.put(state.value);
-        byteBuffer.putLong(getTimestamp());
+        byteBuffer.putLong(getTimestampValue());
         if (isPresent()) {
             byteBuffer.put(present.duplicate());
         }
         return byteBuffer.array();
+    }
+
+    enum State {
+        PRESENT((byte) 1),
+        REMOVED((byte) -1),
+        ABSENT((byte) 0);
+
+        final byte value;
+
+        State(final byte value) {
+            this.value = value;
+        }
+    }
+
+    private static State fromValue(final byte value) {
+        if (value == State.PRESENT.value) {
+            return State.PRESENT;
+        }
+        if (value == State.REMOVED.value) {
+            return State.REMOVED;
+        }
+        return State.ABSENT;
     }
 }

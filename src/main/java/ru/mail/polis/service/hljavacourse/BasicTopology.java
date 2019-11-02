@@ -3,60 +3,64 @@ package ru.mail.polis.service.hljavacourse;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Set;
 
 public class BasicTopology implements Topology<String> {
 
-    private final List<String> nodes;
-
+    @NotNull
     private final String me;
+    @NotNull
+    private final String[] nodes;
 
     /**
      * BasicTopology constructor.
      *
-     * @param nodes  Set (of String) nodes
-     * @param me    String
+     * @param nodes - final Set
+     * @param me    - final String
      */
-    public BasicTopology(final Set<String> nodes, final String me) {
+    public BasicTopology(@NotNull final Set<String> nodes, @NotNull final String me) {
         assert nodes.contains(me);
-        this.nodes = new ArrayList<>(nodes);
         this.me = me;
+        this.nodes = new String[nodes.size()];
+        nodes.toArray(this.nodes);
+        Arrays.sort(this.nodes);
     }
 
+    @NotNull
     @Override
-    public String primaryFor(final ByteBuffer key) {
+    public String primaryFor(@NotNull final ByteBuffer key) {
         final int hash = key.hashCode();
-        final int node = (hash & Integer.MAX_VALUE) % nodes.size();
-        return nodes.get(node);
+        final int node = (hash & Integer.MAX_VALUE) % nodes.length;
+        return nodes[node];
     }
 
     @Override
-    public Set<String> all() {
-        return new HashSet<>(nodes);
-    }
-
-    @Override
-    public boolean isMe(final String node) {
+    public boolean isMe(@NotNull final String node) {
         return me.equals(node);
     }
 
+    @NotNull
     @Override
     public String getMe() {
         return me;
     }
 
+    @NotNull
     @Override
-    public String[] replicas(final ByteBuffer id, final int count) {
-        final String[] result = new String[count];
-        int ind = (id.hashCode() & Integer.MAX_VALUE) % nodes.size();
-        for (int j = 0; j < count; j++) {
-            result[j] = nodes.get(ind);
-            ind = (ind + 1) % nodes.size();
-        }
+    public Set<String> all() {
+        return Set.of(nodes);
+    }
 
+    @NotNull
+    @Override
+    public String[] replicas(final int size, final ByteBuffer id) {
+        int index = (id.hashCode() & Integer.MAX_VALUE) % nodes.length;
+        final String[] result = new String[size];
+        for (int j = 0; j < size; j++) {
+            result[j] = nodes[index];
+            index = (index + 1) % nodes.length;
+        }
         return result;
     }
 }

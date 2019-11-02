@@ -20,7 +20,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.polis.dao.DAO;
 import ru.mail.polis.service.hljavacourse.BasicTopology;
-import ru.mail.polis.service.hljavacourse.NewHttpServerImpl;
+import ru.mail.polis.service.hljavacourse.ReplicasSimpleServiceImpl;
 import ru.mail.polis.service.hljavacourse.Topology;
 
 import java.io.IOException;
@@ -65,6 +65,6 @@ public final class ServiceFactory {
         final Executor executor = Executors.newFixedThreadPool(
                 Runtime.getRuntime().availableProcessors(),
                 new ThreadFactoryBuilder().setNameFormat("worker-%d").build());
-        return NewHttpServerImpl.create(port, dao, executor, nodes);
+        return ReplicasSimpleServiceImpl.create(port, nodes, dao, executor);
     }
 }
