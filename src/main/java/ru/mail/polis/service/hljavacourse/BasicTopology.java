@@ -3,46 +3,60 @@ package ru.mail.polis.service.hljavacourse;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class BasicTopology implements Topology<String> {
 
-    @NotNull
+    private final List<String> nodes;
+
     private final String me;
-    @NotNull
-    private final String[] nodes;
 
     /**
      * BasicTopology constructor.
      *
-     * @param nodes - final Set
-     * @param me    - final String
+     * @param nodes  Set (of String) nodes
+     * @param me    String
      */
-    public BasicTopology(@NotNull final Set<String> nodes, @NotNull final String me) {
+    public BasicTopology(final Set<String> nodes, final String me) {
         assert nodes.contains(me);
+        this.nodes = new ArrayList<>(nodes);
         this.me = me;
-        this.nodes = new String[nodes.size()];
-        nodes.toArray(this.nodes);
-        Arrays.sort(this.nodes);
     }
 
-    @NotNull
     @Override
-    public String primaryFor(@NotNull final ByteBuffer key) {
+    public String primaryFor(final ByteBuffer key) {
         final int hash = key.hashCode();
-        final int node = (hash & Integer.MAX_VALUE) % nodes.length;
-        return nodes[node];
+        final int node = (hash & Integer.MAX_VALUE) % nodes.size();
+        return nodes.get(node);
     }
 
     @Override
-    public boolean isMe(@NotNull final String node) {
+    public Set<String> all() {
+        return new HashSet<>(nodes);
+    }
+
+    @Override
+    public boolean isMe(final String node) {
         return me.equals(node);
     }
 
-    @NotNull
     @Override
-    public Set<String> all() {
-        return Set.of(nodes);
+    public String getMe() {
+        return me;
+    }
+
+    @Override
+    public String[] replicas(final ByteBuffer id, final int count) {
+        final String[] result = new String[count];
+        int ind = (id.hashCode() & Integer.MAX_VALUE) % nodes.size();
+        for (int j = 0; j < count; j++) {
+            result[j] = nodes.get(ind);
+            ind = (ind + 1) % nodes.size();
+        }
+
+        return result;
     }
 }

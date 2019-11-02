@@ -10,10 +10,14 @@ import java.util.Set;
 public interface Topology<T> {
 
     @NotNull
-    T primaryFor(@NotNull ByteBuffer key);
+    T primaryFor(@NotNull final ByteBuffer key);
 
-    boolean isMe(@NotNull T node);
+    boolean isMe(@NotNull final T node);
 
     @NotNull
     Set<T> all();
+
+    String[] replicas(ByteBuffer id, int count);
+
+    String getMe();
 }
