@@ -31,11 +31,11 @@ public class AsyncSimpleServiceImpl extends HttpServer implements Service {
     private final Logger logger = Logger.getLogger(AsyncSimpleServiceImpl.class.getName());
 
     /**
-     * Creating AsyncSimpleServiceImpl.
+     * Creating AsyncSimpleServiceImpl. (Constructor of)
      *
-     * @param port     - final int
-     * @param dao      - final DAO
-     * @param executor - final Executor
+     * @param port     final int
+     * @param dao      final DAO
+     * @param executor final Executor
      * @throws IOException throws Input/Output exception
      */
     public AsyncSimpleServiceImpl(final int port, final DAO dao, final Executor executor) throws IOException {

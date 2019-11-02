@@ -37,12 +37,12 @@ public class ShardedSimpleServiceImpl extends HttpServer implements Service {
     private final Map<String, HttpClient> pool;
 
     /**
-     * Creating ShardedSimpleServiceImpl.
+     * Creating ShardedSimpleServiceImpl. (constructor of)
      *
-     * @param port     - final int
-     * @param dao      - final DAO
-     * @param executor - final Executor
-     * @param topology - final Topology
+     * @param port     final int
+     * @param dao      final DAO
+     * @param executor final Executor
+     * @param topology final Topology
      * @throws IOException throws Input/Output exception
      */
     public ShardedSimpleServiceImpl(final int port,

@@ -16,8 +16,8 @@ public class BasicTopology implements Topology<String> {
     /**
      * BasicTopology constructor.
      *
-     * @param nodes - final Set
-     * @param me    - final String
+     * @param nodes final Set
+     * @param me    final String
      */
     public BasicTopology(@NotNull final Set<String> nodes, @NotNull final String me) {
         assert nodes.contains(me);
