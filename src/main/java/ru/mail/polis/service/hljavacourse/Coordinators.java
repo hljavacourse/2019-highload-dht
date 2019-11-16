@@ -6,7 +6,6 @@ import one.nio.http.HttpSession;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.polis.dao.DAO;
 import ru.mail.polis.dao.TimestampRecord;
-import ru.mail.polis.service.hljavacourse.RequestUtils;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
