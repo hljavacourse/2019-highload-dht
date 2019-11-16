@@ -16,17 +16,15 @@
 
 package ru.mail.polis.service;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.jetbrains.annotations.NotNull;
-import ru.mail.polis.dao.DAO;
-import ru.mail.polis.service.hljavacourse.BasicTopology;
-import ru.mail.polis.service.hljavacourse.ReplicasSimpleServiceImpl;
-import ru.mail.polis.service.hljavacourse.Topology;
-
 import java.io.IOException;
+
 import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+
+import org.jetbrains.annotations.NotNull;
+
+import ru.mail.polis.dao.DAO;
+import ru.mail.polis.service.hljavacourse.ClusterNodes;
+import ru.mail.polis.service.hljavacourse.AsyncHttpService;
 
 /**
  * Constructs {@link Service} instances.
@@ -61,10 +59,7 @@ public final class ServiceFactory {
             throw new IllegalArgumentException("Port out of range");
         }
 
-        final Topology<String> nodes = new BasicTopology(topology, "http://localhost:" + port);
-        final Executor executor = Executors.newFixedThreadPool(
-                Runtime.getRuntime().availableProcessors(),
-                new ThreadFactoryBuilder().setNameFormat("worker-%d").build());
-        return ReplicasSimpleServiceImpl.create(port, nodes, dao, executor);
+        final ClusterNodes nodes = new ClusterNodes(topology, "http://localhost:" + port);
+        return AsyncHttpService.create(port, dao, nodes);
     }
 }

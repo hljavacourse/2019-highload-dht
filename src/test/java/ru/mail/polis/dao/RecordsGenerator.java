@@ -20,7 +20,7 @@ class RecordsGenerator implements Iterator<Record> {
     private final Random values;
     private final Map<Integer, Byte> samples;
 
-    private int record;
+    private int i;
 
     RecordsGenerator(final int count, final int samplePeriod) {
         this.count = count;
@@ -30,17 +30,17 @@ class RecordsGenerator implements Iterator<Record> {
         this.keys = new Random(keySeed);
         this.values = new Random(valueSeed);
         this.samples = samplePeriod > 0 ? new HashMap<>(count / samplePeriod) : null;
-        this.record = 0;
+        this.i = 0;
     }
 
     @Override
     public boolean hasNext() {
-        return record < count;
+        return i < count;
     }
 
     @Override
     public Record next() {
-        record++;
+        i++;
 
         final int keyPayload = keys.nextInt();
         final ByteBuffer key = ByteBuffer.allocate(Integer.BYTES);
@@ -54,8 +54,8 @@ class RecordsGenerator implements Iterator<Record> {
 
         // store the latest value by key or update previously stored one
         if (samples != null) {
-            if (record % samplePeriod == 0
-                    || samples.containsKey(keyPayload)) {
+            if (i % samplePeriod == 0 ||
+                    samples.containsKey(keyPayload)) {
                 samples.put(keyPayload, valuePayload);
             }
         }

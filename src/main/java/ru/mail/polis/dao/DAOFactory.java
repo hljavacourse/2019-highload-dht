@@ -53,6 +53,6 @@ public final class DAOFactory {
             throw new IllegalArgumentException("Path is not a directory: " + data);
         }
 
-        return SimpleDAOImpl.init(data);
+        return DAORocksDB.create(data);
     }
 }
