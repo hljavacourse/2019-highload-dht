@@ -29,10 +29,10 @@ else
 
   echo 'Collecting ASYNC-PROFILER data...'
     echo '[GET]'
-    ./profiler.sh -d 90 -f ~/${PREFIX}_async-profiler_get.svg ${ID} &
+    ./profiler.sh -d 90 -f ~/${PREFIX}_async-profiler_get.svg ${ID}
     wrk -t2 -c10 -d90s -R1000 -s ~/${PREFIX}/2019-highload-dht/src/test/wrk/get.lua http://localhost:8080 > /dev/null
     echo '[PUT]'
-    ./profiler.sh -d 90 -f ~/${PREFIX}_async-profiler_put.svg ${ID} &
+    ./profiler.sh -d 90 -f ~/${PREFIX}_async-profiler_put.svg ${ID}
     wrk -t2 -c10 -d90s -R1000 -s ~/${PREFIX}/2019-highload-dht/src/test/wrk/put.lua http://localhost:8080 > /dev/null
 
   echo 'All done'
