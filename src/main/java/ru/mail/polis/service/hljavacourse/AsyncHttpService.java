@@ -14,7 +14,6 @@ import ru.mail.polis.Record;
 import ru.mail.polis.dao.DAO;
 import ru.mail.polis.dao.DAORocksDB;
 import ru.mail.polis.service.Service;
-import ru.mail.polis.service.hljavacourse.ClusterNodes;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;
