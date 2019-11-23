@@ -114,7 +114,6 @@ public final class DAORocksDB implements DAO {
         }
     }
 
-
     public void upsertRecordWithTimestamp(@NotNull final ByteBuffer keys,
                                           @NotNull final ByteBuffer values) throws IOException {
         try {
