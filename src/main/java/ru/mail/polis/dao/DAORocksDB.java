@@ -88,7 +88,12 @@ public final class DAORocksDB implements DAO {
             }
         }
     }
-
+    
+    /**
+    *Get record form db with timestamp.
+    *
+    *@throws IOException, NoSuchElementExeption
+    */
     @NotNull
     public TimestampRecord getRecordWithTimestamp(@NotNull final ByteBuffer keys)
             throws IOException, NoSuchElementException {
@@ -113,7 +118,12 @@ public final class DAORocksDB implements DAO {
             }
         }
     }
-
+    
+    /**
+    *Upsert record form db with timestamp.
+    *
+    *@throws IOException
+    */
     public void upsertRecordWithTimestamp(@NotNull final ByteBuffer keys,
                                           @NotNull final ByteBuffer values) throws IOException {
         try {
@@ -135,8 +145,12 @@ public final class DAORocksDB implements DAO {
             throw new DAOException("Remove method exception!", e);
         }
     }
-
-
+    
+    /**
+    *Remove record form db with timestamp.
+    *
+    *@throws IOException
+    */
     public void removeRecordWithTimestamp(@NotNull final ByteBuffer key) throws IOException {
         try {
             final byte[] packedKey = decompressKey(key);
