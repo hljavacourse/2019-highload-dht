@@ -8,6 +8,7 @@
 !*.md
 !.gitignore
 !*.java
+!yandex-tank/0.txt
 !README.md
 !LICENSE
 !gradlew.bat
