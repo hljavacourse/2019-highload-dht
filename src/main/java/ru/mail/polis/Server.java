@@ -36,7 +36,13 @@ public final class Server {
     private Server() {
         // Not instantiable
     }
-
+    
+    /**
+     * Starts a single server node.
+     *
+     * @param args unused
+     * @throws IOException in case of any IO error
+     */
     public static void main(final String[] args) throws IOException {
         // Temporary storage in the file system
         final File data = Files.createTempDirectory();
