@@ -92,7 +92,9 @@ public final class DAORocksDB implements DAO {
     /**
     *Get record form db with timestamp.
     *
-    *@throws IOException, NoSuchElementExeption
+    *@param keys
+    *@throws IOException
+    *@return record
     */
     @NotNull
     public TimestampRecord getRecordWithTimestamp(@NotNull final ByteBuffer keys)
