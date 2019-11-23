@@ -48,7 +48,7 @@ final class StreamStorageSession extends HttpSession {
         next();
     }
 
-    private byte[] getByteArr(final int size){
+    private byte[] getByteArr(final int size) {
         return new byte[size];
     }
 
