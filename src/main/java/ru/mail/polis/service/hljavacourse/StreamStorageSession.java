@@ -81,7 +81,7 @@ final class StreamStorageSession extends HttpSession {
             server.incRequestsProcessed();
 
             if ((handling = pipeline.pollFirst()) != null) {
-                if(handling == FIN) {
+                if (handling == FIN) {
                     scheduleClose();
                 } else {
                     try {
