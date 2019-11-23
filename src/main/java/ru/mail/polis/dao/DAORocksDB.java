@@ -93,7 +93,7 @@ public final class DAORocksDB implements DAO {
     *Get record form db with timestamp.
     *
     *@param keys
-    *@throws IOException
+    *@throws IOException in case of get error
     *@return record
     */
     @NotNull
@@ -124,7 +124,7 @@ public final class DAORocksDB implements DAO {
     /**
     *Upsert record form db with timestamp.
     *
-    *@throws IOException
+    *@throws IOException in ccase of upsert error
     */
     public void upsertRecordWithTimestamp(@NotNull final ByteBuffer keys,
                                           @NotNull final ByteBuffer values) throws IOException {
@@ -151,7 +151,7 @@ public final class DAORocksDB implements DAO {
     /**
     *Remove record form db with timestamp.
     *
-    *@throws IOException
+    *@throws IOException in case of remove error
     */
     public void removeRecordWithTimestamp(@NotNull final ByteBuffer key) throws IOException {
         try {
