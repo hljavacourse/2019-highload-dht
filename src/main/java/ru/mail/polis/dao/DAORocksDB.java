@@ -92,7 +92,7 @@ public final class DAORocksDB implements DAO {
     /**
     *Get record form db with timestamp.
     *
-    *@param keys
+    *@param keys to identify record
     *@throws IOException in case of get error
     *@return record
     */
