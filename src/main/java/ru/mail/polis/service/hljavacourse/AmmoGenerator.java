@@ -54,7 +54,7 @@ public final class AmmoGenerator {
         final List<String> keys = getUniqkeys(amount);
         final Double repeated = keys.size() * 0.1;
         final int repeatedAmount = repeated.intValue();
-        for (int i = 0; i < repeatedAmount; i++){
+        for (int i = 0; i < repeatedAmount; i++) {
             keys.set(getRandNumbInRange(0, amount), keys.get(getRandNumbInRange(0, amount)));
         }
         for (final String key : keys) {
@@ -86,7 +86,7 @@ public final class AmmoGenerator {
         }
     }
 
-    private static void generateMixedPutsAndGets(final int amount) throws IOException{
+    private static void generateMixedPutsAndGets(final int amount) throws IOException {
         final int halfAmount = amount / 2;
         final List<String> keys = getUniqkeys(halfAmount);
         final List<String> puttedKeys = new ArrayList<>();
@@ -117,7 +117,7 @@ public final class AmmoGenerator {
         System.out.write(DILIM.getBytes(StandardCharsets.US_ASCII));
     }
 
-    private static void getKey(final String key) throws IOException{
+    private static void getKey(final String key) throws IOException {
         final ByteArrayOutputStream request = new ByteArrayOutputStream();
         try (Writer writer = new OutputStreamWriter(request, StandardCharsets.US_ASCII)) {
             writer.write("GET /v0/entity?id=" + key + " HTTP/1.1" + DILIM);
@@ -129,6 +129,10 @@ public final class AmmoGenerator {
         System.out.write(DILIM.getBytes(StandardCharsets.US_ASCII));
     }
 
+    /**
+     *  Parsing input agruments and create the ammo for yandex-tank.
+     *
+     */
     public static void main(final String[] args) throws IOException {
         if (args.length != 2) {
             System.err.println("Usage:\n\tjava -cp build/classes/java/main ru.mail.polis.service.<login>"
