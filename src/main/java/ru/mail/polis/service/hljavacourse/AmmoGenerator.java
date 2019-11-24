@@ -29,7 +29,7 @@ public final class AmmoGenerator {
     }
 
     @NotNull
-    private static List<String> getUniqkeys(final int amount){
+    private static List<String> getUniqkeys(final int amount) {
         final List<String> keys = new ArrayList<>(amount);
         for (long i = 0; i < amount; i++) {
             keys.add(Long.toHexString(i));
@@ -37,12 +37,12 @@ public final class AmmoGenerator {
         return keys;
     }
 
-    private static int getRandNumbInRange(final int min, final int max){
+    private static int getRandNumbInRange(final int min, final int max) {
         final Random r = new Random();
         return r.ints(min, max).findFirst().getAsInt();
     }
 
-    private static void generateUniqPuts(final int amount) throws IOException{
+    private static void generateUniqPuts(final int amount) throws IOException {
         final List<String> keys = getUniqkeys(amount);
         for (final String key : keys) {
             final byte[] value = randVal();
@@ -50,7 +50,7 @@ public final class AmmoGenerator {
         }
     }
 
-    private static void generate10PercentOverwritePuts(final int amount) throws IOException{
+    private static void generate10PercentOverwritePuts(final int amount) throws IOException {
         final List<String> keys = getUniqkeys(amount);
         final Double repeated = keys.size() * 0.1;
         final int repeatedAmount = repeated.intValue();
@@ -63,7 +63,7 @@ public final class AmmoGenerator {
         }
     }
 
-    private static void generateExistGets(final int amount) throws IOException{
+    private static void generateExistGets(final int amount) throws IOException {
         final List<String> keys = getUniqkeys(amount);
         Collections.shuffle(keys);
         for (final String key : keys) {
@@ -71,7 +71,7 @@ public final class AmmoGenerator {
         }
     }
 
-    private static void generateExistGetsNewestFirst(final int amount) throws IOException{
+    private static void generateExistGetsNewestFirst(final int amount) throws IOException {
         final List<String> keys = getUniqkeys(amount);
         final Random r = new Random();
         for (int i = 0; i < amount; i++) {
@@ -103,7 +103,7 @@ public final class AmmoGenerator {
         }
     }
 
-    private static void putKeyVal(final String key, final byte[] value) throws IOException{
+    private static void putKeyVal(final String key, final byte[] value) throws IOException {
         final ByteArrayOutputStream request = new ByteArrayOutputStream();
         try (Writer writer = new OutputStreamWriter(request, StandardCharsets.US_ASCII)) {
             writer.write("PUT /v0/entity?id=" + key + " HTTP/1.1" + DILIM);
@@ -119,7 +119,7 @@ public final class AmmoGenerator {
 
     private static void getKey(final String key) throws IOException{
         final ByteArrayOutputStream request = new ByteArrayOutputStream();
-        try (Writer writer = new OutputStreamWriter(request, StandardCharsets.US_ASCII)){
+        try (Writer writer = new OutputStreamWriter(request, StandardCharsets.US_ASCII)) {
             writer.write("GET /v0/entity?id=" + key + " HTTP/1.1" + DILIM);
             writer.write(DILIM);
         }
@@ -129,7 +129,7 @@ public final class AmmoGenerator {
         System.out.write(DILIM.getBytes(StandardCharsets.US_ASCII));
     }
 
-    public static void main(final String[] args) throws IOException{
+    public static void main(final String[] args) throws IOException {
         if (args.length != 2) {
             System.err.println("Usage:\n\tjava -cp build/classes/java/main ru.mail.polis.service.<login>"
                     + ".AmmoGenerator <put|get> <requests>");
